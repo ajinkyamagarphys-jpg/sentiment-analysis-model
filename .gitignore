@@ -1,0 +1,11 @@
+.env
+backend/.env
+backend/model_artifacts/
+database/*.sqlite
+database/*.sqlite-shm
+database/*.sqlite-wal
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+*.pyc

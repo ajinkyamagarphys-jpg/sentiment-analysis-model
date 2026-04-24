@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mental Health Sentiment Analysis</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-label="Sentiment analyzer">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">BERT + Gemini fallback</p>
+            <h1>Mental Health Sentiment Analysis</h1>
+          </div>
+          <div class="status" id="status">Checking API...</div>
+        </header>
+
+        <form id="analysis-form" class="input-panel">
+          <label for="statement">User statement</label>
+          <textarea
+            id="statement"
+            name="statement"
+            rows="7"
+            placeholder="Type a statement to analyze..."
+            required
+          ></textarea>
+          <div class="actions">
+            <button type="submit" id="submit-button">Analyze</button>
+            <button type="button" id="reset-button" class="secondary">New conversation</button>
+          </div>
+        </form>
+
+        <section class="result-grid" aria-live="polite">
+          <article class="result-card primary-result">
+            <span class="label">Sentiment</span>
+            <strong id="result-label">Waiting</strong>
+            <span id="confidence">Confidence: --</span>
+            <span id="source">Source: --</span>
+          </article>
+
+          <article class="result-card">
+            <span class="label">Recommendation</span>
+            <p id="recommendation">Submit a statement to see the analysis.</p>
+          </article>
+        </section>
+
+        <section class="scores-section">
+          <h2>Scores</h2>
+          <div id="scores" class="scores"></div>
+        </section>
+
+        <p class="disclaimer" id="disclaimer">
+          This tool provides sentiment analysis only and does not replace medical, psychological, or emergency care.
+        </p>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
