@@ -11,7 +11,7 @@
       <section class="workspace" aria-label="Sentiment analyzer">
         <header class="topbar">
           <div>
-            <p class="eyebrow">BERT + Gemini fallback</p>
+            <p class="eyebrow">BERT sentiment + Gemini mental-health signal</p>
             <h1>Mental Health Sentiment Analysis</h1>
           </div>
           <div class="status" id="status">Checking API...</div>
@@ -34,10 +34,17 @@
 
         <section class="result-grid" aria-live="polite">
           <article class="result-card primary-result">
-            <span class="label">Sentiment</span>
-            <strong id="result-label">Waiting</strong>
-            <span id="confidence">Confidence: --</span>
-            <span id="source">Source: --</span>
+            <span class="label">Mental-health signal</span>
+            <strong id="mental-label">Waiting</strong>
+            <span id="mental-confidence">Confidence: --</span>
+            <span id="mental-source">Source: --</span>
+          </article>
+
+          <article class="result-card primary-result">
+            <span class="label">BERT general sentiment</span>
+            <strong id="bert-label">Waiting</strong>
+            <span id="bert-confidence">Confidence: --</span>
+            <span id="bert-source">Source: --</span>
           </article>
 
           <article class="result-card">
@@ -46,9 +53,15 @@
           </article>
         </section>
 
-        <section class="scores-section">
-          <h2>Scores</h2>
-          <div id="scores" class="scores"></div>
+        <section class="scores-layout">
+          <div class="scores-section">
+            <h2>Mental-health Scores</h2>
+            <div id="mental-scores" class="scores"></div>
+          </div>
+          <div class="scores-section">
+            <h2>BERT Scores</h2>
+            <div id="bert-scores" class="scores"></div>
+          </div>
         </section>
 
         <p class="disclaimer" id="disclaimer">

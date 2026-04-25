@@ -15,6 +15,15 @@ class Score(BaseModel):
     score: float
 
 
+class AnalysisResult(BaseModel):
+    label: str
+    confidence: float
+    source: str
+    all_scores: list[Score]
+    model_status: str
+    raw: dict[str, Any] | None = None
+
+
 class AnalysisResponse(BaseModel):
     conversation_id: str
     message_id: str
@@ -22,6 +31,8 @@ class AnalysisResponse(BaseModel):
     confidence: float
     source: str
     all_scores: list[Score]
+    general_sentiment: AnalysisResult
+    mental_health: AnalysisResult
     crisis_detected: bool
     recommendation: str
     disclaimer: str

@@ -1,13 +1,13 @@
 # Mental Health Sentiment Analysis
 
-FastAPI + SQLite + BERT fine-tuning project for classifying user statements. The backend uses your trained local BERT model first, then falls back to Gemini when BERT is missing or below the configured confidence threshold.
+FastAPI + SQLite project for classifying user statements. The backend uses your trained local BERT model for 3-class general sentiment only: `positive`, `neutral`, and `negative`. Gemini is used separately for broader mental-health labels such as anxiety, depression, stress, loneliness, anger, normal, and suicidal.
 
 This tool is for sentiment analysis only. It is not a diagnosis or a replacement for professional or emergency care.
 
 ## Project Structure
 
 ```text
-backend/    FastAPI app, BERT inference, Gemini fallback, training script
+backend/    FastAPI app, BERT inference, Gemini mental-health analysis, training script
 frontend/   Browser UI with no build step
 database/   SQLite schema and generated app.sqlite
 data/       Place your Kaggle dataset here
@@ -36,7 +36,7 @@ Copy-Item backend\.env.example backend\.env
 
 If `py -3.11` is not available, install Python 3.11 or 3.12 first, then recreate the virtual environment.
 
-Edit `backend\.env` and set `GEMINI_API_KEY` if you want fallback analysis before the BERT model is trained.
+Edit `backend\.env` and set `GEMINI_API_KEY` if you want mental-health labels beyond BERT's `positive`, `neutral`, and `negative`.
 
 ## Train BERT
 
@@ -74,13 +74,13 @@ database/app.sqlite
 
 This is enough for local context windows because the app only reads the most recent `CONTEXT_WINDOW_MESSAGES` rows per conversation. Supabase is not needed unless you later want hosted multi-device users, auth, or realtime collaboration.
 
-## Gemini Fallback
+## Gemini Mental-Health Labels
 
-The fallback uses Google Gemini REST `generateContent` with the `x-goog-api-key` header. Set:
+Gemini uses Google Gemini REST `generateContent` with the `x-goog-api-key` header. Set:
 
 ```text
 GEMINI_API_KEY=your_key_here
 GEMINI_MODEL=gemini-2.5-flash
 ```
 
-If BERT is trained and confident, Gemini is not called.
+With the current dataset, BERT should be treated as general sentiment only. Gemini handles the broader mental-health label because those labels are not present in the Kaggle CSV.

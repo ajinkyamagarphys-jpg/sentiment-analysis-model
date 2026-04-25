@@ -91,6 +91,8 @@ async def analyze_sentiment(payload: AnalysisRequest) -> AnalysisResponse:
         confidence=float(result["confidence"]),
         source=result["source"],
         all_scores=all_scores,
+        general_sentiment=result["general_sentiment"],
+        mental_health=result["mental_health"],
         crisis_detected=bool(result["crisis_detected"]),
         recommendation=result["recommendation"],
         disclaimer=DISCLAIMER,

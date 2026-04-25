@@ -5,12 +5,16 @@ const statementInput = document.querySelector("#statement");
 const submitButton = document.querySelector("#submit-button");
 const resetButton = document.querySelector("#reset-button");
 const statusEl = document.querySelector("#status");
-const labelEl = document.querySelector("#result-label");
-const confidenceEl = document.querySelector("#confidence");
-const sourceEl = document.querySelector("#source");
+const mentalLabelEl = document.querySelector("#mental-label");
+const mentalConfidenceEl = document.querySelector("#mental-confidence");
+const mentalSourceEl = document.querySelector("#mental-source");
+const bertLabelEl = document.querySelector("#bert-label");
+const bertConfidenceEl = document.querySelector("#bert-confidence");
+const bertSourceEl = document.querySelector("#bert-source");
 const recommendationEl = document.querySelector("#recommendation");
 const disclaimerEl = document.querySelector("#disclaimer");
-const scoresEl = document.querySelector("#scores");
+const mentalScoresEl = document.querySelector("#mental-scores");
+const bertScoresEl = document.querySelector("#bert-scores");
 
 let conversationId = localStorage.getItem("conversationId");
 
@@ -23,10 +27,10 @@ function percent(value) {
   return `${Math.round(Number(value) * 100)}%`;
 }
 
-function renderScores(scores) {
-  scoresEl.innerHTML = "";
+function renderScores(target, scores) {
+  target.innerHTML = "";
   if (!scores || scores.length === 0) {
-    scoresEl.textContent = "No score distribution available.";
+    target.textContent = "No score distribution available.";
     return;
   }
 
@@ -47,7 +51,7 @@ function renderScores(scores) {
     value.textContent = percent(item.score);
 
     row.append(label, bar, value);
-    scoresEl.appendChild(row);
+    target.appendChild(row);
   });
 }
 
@@ -88,12 +92,26 @@ form.addEventListener("submit", async (event) => {
     conversationId = result.conversation_id;
     localStorage.setItem("conversationId", conversationId);
 
-    labelEl.textContent = result.label;
-    confidenceEl.textContent = `Confidence: ${percent(result.confidence)}`;
-    sourceEl.textContent = `Source: ${result.source}`;
+    const mental = result.mental_health || result;
+    const bert = result.general_sentiment || {
+      label: "unknown",
+      confidence: 0,
+      source: "unavailable",
+      all_scores: [],
+    };
+
+    mentalLabelEl.textContent = mental.label;
+    mentalConfidenceEl.textContent = `Confidence: ${percent(mental.confidence)}`;
+    mentalSourceEl.textContent = `Source: ${mental.source}`;
+
+    bertLabelEl.textContent = bert.label;
+    bertConfidenceEl.textContent = `Confidence: ${percent(bert.confidence)}`;
+    bertSourceEl.textContent = `Source: ${bert.source}`;
+
     recommendationEl.textContent = result.recommendation;
     disclaimerEl.textContent = result.disclaimer;
-    renderScores(result.all_scores);
+    renderScores(mentalScoresEl, mental.all_scores);
+    renderScores(bertScoresEl, bert.all_scores);
   } catch (error) {
     recommendationEl.textContent = error.message;
   } finally {
@@ -106,11 +124,15 @@ resetButton.addEventListener("click", () => {
   conversationId = null;
   localStorage.removeItem("conversationId");
   statementInput.value = "";
-  labelEl.textContent = "Waiting";
-  confidenceEl.textContent = "Confidence: --";
-  sourceEl.textContent = "Source: --";
+  mentalLabelEl.textContent = "Waiting";
+  mentalConfidenceEl.textContent = "Confidence: --";
+  mentalSourceEl.textContent = "Source: --";
+  bertLabelEl.textContent = "Waiting";
+  bertConfidenceEl.textContent = "Confidence: --";
+  bertSourceEl.textContent = "Source: --";
   recommendationEl.textContent = "Submit a statement to see the analysis.";
-  scoresEl.innerHTML = "";
+  mentalScoresEl.innerHTML = "";
+  bertScoresEl.innerHTML = "";
 });
 
 checkHealth();

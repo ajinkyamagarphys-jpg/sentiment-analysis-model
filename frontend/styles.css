@@ -142,7 +142,7 @@ button.secondary {
 
 .result-grid {
   display: grid;
-  grid-template-columns: minmax(240px, 0.8fr) minmax(280px, 1.2fr);
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
   gap: 16px;
   margin: 24px 0;
 }
@@ -161,7 +161,8 @@ button.secondary {
   gap: 10px;
 }
 
-#result-label {
+#mental-label,
+#bert-label {
   font-size: 2rem;
   text-transform: capitalize;
 }
@@ -171,8 +172,15 @@ button.secondary {
   line-height: 1.55;
 }
 
-.scores-section {
+.scores-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 18px;
   margin-top: 20px;
+}
+
+.scores-section {
+  min-width: 0;
 }
 
 .scores {
@@ -213,7 +221,8 @@ button.secondary {
   }
 
   .topbar,
-  .result-grid {
+  .result-grid,
+  .scores-layout {
     grid-template-columns: 1fr;
     display: grid;
   }
