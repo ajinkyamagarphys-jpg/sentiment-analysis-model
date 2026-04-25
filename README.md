@@ -17,52 +17,84 @@ data/       Place your Kaggle dataset here
 
 Use Python 3.11 or 3.12 for this project. Python 3.14 is too new for parts of the ML stack; packages such as pandas, torch, and transformers may try to build from source instead of installing prebuilt wheels.
 
-Check installed Python launchers:
+From the project root, create and activate a virtual environment, install dependencies, and create your `.env` file.
 
-```powershell
-py -0p
+### Linux / macOS
+
+```bash
+cd /path/to/sentiment-analysis-model
+
+# Prefer 3.11, else use 3.12
+python3.11 -m venv .venv || python3.12 -m venv .venv
+source .venv/bin/activate
+
+python -m pip install --upgrade pip setuptools wheel
+pip install -r backend/requirements.txt
+cp backend/.env.example backend/.env
 ```
 
-Create the virtual environment with Python 3.11 if it is available:
+### Windows (PowerShell)
 
 ```powershell
-cd "c:\Users\ajink\Desktop\sentiment analysis model"
+cd "c:\path\to\sentiment-analysis-model"
+
+# See installed Python launchers
+py -0p
+
+# Prefer 3.11, else use 3.12
 py -3.11 -m venv .venv
+# If that fails, run: py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
+
 python -m pip install --upgrade pip setuptools wheel
 pip install -r backend\requirements.txt
 Copy-Item backend\.env.example backend\.env
 ```
 
-If `py -3.11` is not available, install Python 3.11 or 3.12 first, then recreate the virtual environment.
+If Python 3.11 is unavailable, use Python 3.12 instead and recreate the environment.
 
 Edit `backend\.env` and set `GEMINI_API_KEY` if you want mental-health labels beyond BERT's `positive`, `neutral`, and `negative`.
+Edit `backend/.env` and set `GEMINI_API_KEY` if you want fallback analysis before the BERT model is trained.
 
 ## Train BERT
 
-Put your Kaggle file in `data/`, then run:
+Put your Kaggle file in `data/`, then run (with your virtual environment still active):
 
-```powershell
-python backend\scripts\train_bert.py --data data\your_dataset.csv
+For detailed dataset instructions and recommended Kaggle datasets, see `data/DATASET_GUIDE.md`.
+
+```bash
+python backend/scripts/train_bert.py --data data/your_dataset.csv
 ```
 
 The script auto-detects common text columns such as `statement`, `text`, `message`, and common label columns such as `sentiment`, `label`, `status`. If your dataset uses different names, pass them explicitly:
 
-```powershell
-python backend\scripts\train_bert.py --data data\your_dataset.csv --text-column "statement" --label-column "sentiment"
+```bash
+python backend/scripts/train_bert.py --data data/your_dataset.csv --text-column "statement" --label-column "sentiment"
 ```
 
-The trained model is saved to `backend\model_artifacts\bert-sentiment`, which the API loads on startup.
+The trained model is saved to `backend/model_artifacts/bert-sentiment`, which the API loads on startup.
 
 ## Run
 
-Start the API:
+Start the API from the project root (with the virtual environment active):
 
-```powershell
+```bash
 uvicorn app.main:app --reload --app-dir backend --host 127.0.0.1 --port 8000
 ```
 
-Open `frontend\index.html` in a browser, or serve the folder with any static server. The UI calls `http://localhost:8000`.
+Check backend health:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+Open `frontend/index.html` in a browser, or serve the folder with any static server:
+
+```bash
+python -m http.server 5500 --directory frontend
+```
+
+Then open `http://127.0.0.1:5500`.
 
 ## SQLite Context
 

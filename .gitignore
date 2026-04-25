@@ -9,3 +9,14 @@ __pycache__/
 .venv/
 venv/
 *.pyc
+
+# OS metadata
+.DS_Store
+
+# Local datasets and archives (keep docs in data/ tracked)
+data/**/*.csv
+data/**/*.xlsx
+data/**/*.xls
+data/**/*.json
+data/**/*.sqlite
+data/**/*.zip
