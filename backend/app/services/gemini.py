@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Any
+from typing import Any, Optional
 
 import httpx
 
 
 class GeminiSentimentFallback:
-    def __init__(self, api_key: str, model: str, labels: list[str] | None = None) -> None:
+    def __init__(self, api_key: str, model: str, labels: Optional[list[str]] = None) -> None:
         self.api_key = api_key
         self.model = model
         self.labels = labels or [
@@ -52,7 +52,20 @@ class GeminiSentimentFallback:
 
         async with httpx.AsyncClient(timeout=30) as client:
             response = await client.post(url, headers=headers, json=payload)
-            response.raise_for_status()
+            if response.status_code != 200:
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get("error", {}).get("message", response.text)
+                except Exception:
+                    error_msg = response.text
+                return {
+                    "available": False,
+                    "reason": f"Gemini API Error ({response.status_code}): {error_msg}",
+                    "label": "unknown",
+                    "confidence": 0.0,
+                    "all_scores": [],
+                    "raw": None,
+                }
             body = response.json()
 
         text = self._extract_text(body)

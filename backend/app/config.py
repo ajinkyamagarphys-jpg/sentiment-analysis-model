@@ -1,4 +1,7 @@
+
 from __future__ import annotations
+from typing import Optional
+
 
 import os
 from dataclasses import dataclass
@@ -42,7 +45,7 @@ class Settings:
     bert_confidence_threshold: float = float(os.getenv("BERT_CONFIDENCE_THRESHOLD", "0.58"))
     context_window_messages: int = int(os.getenv("CONTEXT_WINDOW_MESSAGES", "8"))
     frontend_origin: str = os.getenv("FRONTEND_ORIGIN", "http://localhost:5500")
-    sentiment_labels: list[str] | None = None
+    sentiment_labels: Optional[list[str]] = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "sentiment_labels", _labels_env())

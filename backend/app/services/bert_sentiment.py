@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 
 class BertSentimentAnalyzer:
     def __init__(self, model_dir: Path) -> None:
         self.model_dir = model_dir
-        self.tokenizer: Any | None = None
-        self.model: Any | None = None
-        self.torch: Any | None = None
+        self.tokenizer: Optional[Any] = None
+        self.model: Optional[Any] = None
+        self.torch: Optional[Any] = None
         self.status = "BERT model not loaded. Train first with backend/scripts/train_bert.py."
 
     @property

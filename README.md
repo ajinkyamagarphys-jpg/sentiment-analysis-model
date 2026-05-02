@@ -88,13 +88,15 @@ Check backend health:
 curl http://127.0.0.1:8000/health
 ```
 
-Open `frontend/index.html` in a browser, or serve the folder with any static server:
+Open `frontend/index.html` in a browser, or serve the folder with a static server.
+To run the frontend on a local server, open a new terminal window and run:
 
 ```bash
-python -m http.server 5500 --directory frontend
+cd frontend
+python3 -m http.server 5500
 ```
 
-Then open `http://127.0.0.1:5500`.
+Then open `http://localhost:5500` in your browser.
 
 ## SQLite Context
 

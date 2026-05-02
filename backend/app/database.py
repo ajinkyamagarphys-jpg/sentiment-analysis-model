@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from typing import Any, Optional
+
 import uuid
 from pathlib import Path
 from typing import Any
@@ -26,7 +28,7 @@ def init_database() -> None:
         connection.executescript(schema)
 
 
-def ensure_conversation(conversation_id: str | None) -> str:
+def ensure_conversation(conversation_id: Optional[str]) -> str:
     resolved_id = conversation_id or str(uuid.uuid4())
     with get_connection() as connection:
         connection.execute(
@@ -62,7 +64,7 @@ def save_analysis(
     all_scores: list[dict[str, Any]],
     crisis_detected: bool,
     recommendation: str,
-    raw_response: dict[str, Any] | None,
+    raw_response: Optional[dict[str, Any]],
 ) -> str:
     analysis_id = str(uuid.uuid4())
     with get_connection() as connection:

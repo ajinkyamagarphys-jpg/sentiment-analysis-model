@@ -21,16 +21,36 @@ class SentimentAnalyzer:
         self.allow_gemini_fallback = allow_gemini_fallback
 
     async def analyze(self, statement: str, context: list[dict[str, str]]) -> dict[str, Any]:
+        force_ai = "--force-ai" in statement
+        if force_ai:
+            statement = statement.replace("--force-ai", "").strip()
+
         crisis_detected = detect_crisis(statement)
-        bert_result = self._general_sentiment(statement)
+        
+        if force_ai:
+            bert_result = {
+                "label": "skipped",
+                "confidence": 0.0,
+                "source": "skipped",
+                "all_scores": [],
+                "model_status": "Skipped due to --force-ai flag",
+                "raw": None,
+            }
+        else:
+            bert_result = self._general_sentiment(statement)
+
         mental_health_result = self._unavailable_mental_health()
 
-        if self.allow_gemini_fallback:
+        if self.allow_gemini_fallback or force_ai:
             try:
                 gemini_result = await self.gemini.analyze(statement, context)
                 if gemini_result["available"]:
                     mental_health_result = self._normalize_result(gemini_result, "gemini")
+                else:
+                    mental_health_result = self._normalize_result(gemini_result, "gemini_error")
+                    mental_health_result["model_status"] = gemini_result.get("reason", "Unknown Gemini Error")
             except Exception as exc:
+                mental_health_result["source"] = "gemini_error"
                 mental_health_result["model_status"] = f"Gemini mental-health analysis failed: {exc}"
 
         mental_health_result = self._with_safety(mental_health_result, crisis_detected)

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
 
 class AnalysisRequest(BaseModel):
     statement: str = Field(..., min_length=1, max_length=5000)
-    conversation_id: str | None = None
+    conversation_id: Optional[str] = None
 
 
 class Score(BaseModel):
@@ -21,7 +21,7 @@ class AnalysisResult(BaseModel):
     source: str
     all_scores: list[Score]
     model_status: str
-    raw: dict[str, Any] | None = None
+    raw: Optional[dict[str, Any]] = None
 
 
 class AnalysisResponse(BaseModel):
@@ -37,7 +37,7 @@ class AnalysisResponse(BaseModel):
     recommendation: str
     disclaimer: str
     model_status: str
-    raw: dict[str, Any] | None = None
+    raw: Optional[dict[str, Any]] = None
 
 
 class HealthResponse(BaseModel):

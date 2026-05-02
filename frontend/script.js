@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8000";
+const API_BASE = "http://127.0.0.1:8000";
 
 const form = document.querySelector("#analysis-form");
 const statementInput = document.querySelector("#statement");
@@ -112,8 +112,16 @@ form.addEventListener("submit", async (event) => {
     disclaimerEl.textContent = result.disclaimer;
     renderScores(mentalScoresEl, mental.all_scores);
     renderScores(bertScoresEl, bert.all_scores);
+    
+    if (result.model_status) {
+      const isWarn = result.model_status.toLowerCase().includes("error") || 
+                     result.model_status.toLowerCase().includes("failed") || 
+                     result.model_status.toLowerCase().includes("exceeded");
+      setStatus(isWarn ? result.model_status : "Analysis complete", isWarn ? "warn" : "ok");
+    }
   } catch (error) {
     recommendationEl.textContent = error.message;
+    setStatus(error.message, "warn");
   } finally {
     submitButton.disabled = false;
     submitButton.textContent = "Analyze";
