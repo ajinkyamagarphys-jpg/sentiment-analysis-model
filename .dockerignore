@@ -1,0 +1,11 @@
+.git
+.venv
+backend/venv
+frontend
+__pycache__
+*.pyc
+.env
+backend/.env
+data/
+*.sqlite
+database/app.sqlite

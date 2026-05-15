@@ -1,0 +1,45 @@
+<svg viewBox="0 0 680 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bertNode" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f4f9ff"/>
+      <stop offset="100%" stop-color="#dfeeff"/>
+    </linearGradient>
+  </defs>
+
+  <text x="20" y="30" font-family="Inter, sans-serif" font-size="14" fill="#334155">Input tokens</text>
+  <text x="250" y="30" font-family="Inter, sans-serif" font-size="14" fill="#334155">Context layers</text>
+  <text x="525" y="30" font-family="Inter, sans-serif" font-size="14" fill="#334155">Sentiment output</text>
+
+  <rect x="20" y="50" width="110" height="40" rx="10" fill="url(#bertNode)" stroke="#9db5d0"/>
+  <rect x="20" y="104" width="110" height="40" rx="10" fill="url(#bertNode)" stroke="#9db5d0"/>
+  <rect x="20" y="158" width="110" height="40" rx="10" fill="url(#bertNode)" stroke="#9db5d0"/>
+
+  <circle cx="280" cy="72" r="20" fill="#ebf4ff" stroke="#8ea7c4"/>
+  <circle cx="330" cy="122" r="20" fill="#ebf4ff" stroke="#8ea7c4"/>
+  <circle cx="280" cy="172" r="20" fill="#ebf4ff" stroke="#8ea7c4"/>
+  <circle cx="390" cy="98" r="20" fill="#e7f2ff" stroke="#86a1bf"/>
+  <circle cx="390" cy="148" r="20" fill="#e7f2ff" stroke="#86a1bf"/>
+
+  <rect x="520" y="58" width="140" height="46" rx="12" fill="#e9f8ef" stroke="#8cc3a1"/>
+  <rect x="520" y="126" width="140" height="46" rx="12" fill="#f2f4ff" stroke="#9ea8db"/>
+
+  <line x1="130" y1="70" x2="260" y2="72" stroke="#7b91ab"/>
+  <line x1="130" y1="124" x2="260" y2="72" stroke="#7b91ab"/>
+  <line x1="130" y1="178" x2="260" y2="172" stroke="#7b91ab"/>
+  <line x1="130" y1="124" x2="310" y2="122" stroke="#7b91ab"/>
+
+  <line x1="300" y1="72" x2="370" y2="98" stroke="#7b91ab"/>
+  <line x1="350" y1="122" x2="370" y2="98" stroke="#7b91ab"/>
+  <line x1="350" y1="122" x2="370" y2="148" stroke="#7b91ab"/>
+  <line x1="300" y1="172" x2="370" y2="148" stroke="#7b91ab"/>
+
+  <line x1="410" y1="98" x2="520" y2="81" stroke="#7b91ab"/>
+  <line x1="410" y1="148" x2="520" y2="149" stroke="#7b91ab"/>
+
+  <text x="40" y="75" font-family="Inter, sans-serif" font-size="11" fill="#334155">Token 1</text>
+  <text x="40" y="129" font-family="Inter, sans-serif" font-size="11" fill="#334155">Token 2</text>
+  <text x="40" y="183" font-family="Inter, sans-serif" font-size="11" fill="#334155">Token 3</text>
+
+  <text x="560" y="86" font-family="Inter, sans-serif" font-size="12" fill="#1e6444">Positive</text>
+  <text x="560" y="154" font-family="Inter, sans-serif" font-size="12" fill="#3a4a91">Negative</text>
+</svg>

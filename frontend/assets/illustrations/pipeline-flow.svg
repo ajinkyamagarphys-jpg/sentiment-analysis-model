@@ -1,0 +1,39 @@
+<svg viewBox="0 0 980 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="node" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#e8f0ff"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#6f84a1"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="80" width="150" height="70" rx="16" fill="url(#node)" stroke="#8ca2bf"/>
+  <text x="95" y="121" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" fill="#334155">User Input</text>
+
+  <rect x="210" y="80" width="170" height="70" rx="16" fill="url(#node)" stroke="#8ca2bf"/>
+  <text x="295" y="114" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" fill="#334155">Text</text>
+  <text x="295" y="133" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" fill="#334155">Processing</text>
+
+  <rect x="420" y="80" width="170" height="70" rx="16" fill="url(#node)" stroke="#8ca2bf"/>
+  <text x="505" y="114" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" fill="#334155">Dual</text>
+  <text x="505" y="133" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" fill="#334155">Analysis</text>
+
+  <rect x="640" y="30" width="180" height="60" rx="14" fill="#eef9f2" stroke="#8dc4a1"/>
+  <text x="730" y="66" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" fill="#24593e">BERT Model</text>
+
+  <rect x="640" y="140" width="180" height="60" rx="14" fill="#f0f2ff" stroke="#9aa4d9"/>
+  <text x="730" y="176" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" fill="#303f7d">Gemini Labels</text>
+
+  <rect x="850" y="80" width="120" height="70" rx="16" fill="url(#node)" stroke="#8ca2bf"/>
+  <text x="910" y="114" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#334155">Combined</text>
+  <text x="910" y="133" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#334155">Results</text>
+
+  <line x1="170" y1="115" x2="210" y2="115" stroke="#6f84a1" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="380" y1="115" x2="420" y2="115" stroke="#6f84a1" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="590" y1="115" x2="640" y2="60" stroke="#6f84a1" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="590" y1="115" x2="640" y2="170" stroke="#6f84a1" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="820" y1="60" x2="850" y2="104" stroke="#6f84a1" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="820" y1="170" x2="850" y2="126" stroke="#6f84a1" stroke-width="2.5" marker-end="url(#arrow)"/>
+</svg>
