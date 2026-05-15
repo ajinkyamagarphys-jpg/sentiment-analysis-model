@@ -3,8 +3,7 @@ from __future__ import annotations
 import json
 import sqlite3
 import uuid
-from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from .config import PROJECT_DIR, settings
 
@@ -26,7 +25,7 @@ def init_database() -> None:
         connection.executescript(schema)
 
 
-def ensure_conversation(conversation_id: str | None) -> str:
+def ensure_conversation(conversation_id: Optional[str]) -> str:
     resolved_id = conversation_id or str(uuid.uuid4())
     with get_connection() as connection:
         connection.execute(
@@ -62,7 +61,7 @@ def save_analysis(
     all_scores: list[dict[str, Any]],
     crisis_detected: bool,
     recommendation: str,
-    raw_response: dict[str, Any] | None,
+    raw_response: Optional[dict[str, Any]],
 ) -> str:
     analysis_id = str(uuid.uuid4())
     with get_connection() as connection:
@@ -102,3 +101,34 @@ def get_recent_context(conversation_id: str, limit: int) -> list[dict[str, str]]
             (conversation_id, limit),
         ).fetchall()
     return [{"role": row["role"], "content": row["content"]} for row in reversed(rows)]
+
+
+def get_runtime_settings() -> dict[str, Any]:
+    with get_connection() as connection:
+        rows = connection.execute("SELECT key, value FROM runtime_settings").fetchall()
+    settings_map: dict[str, Any] = {}
+    for row in rows:
+        key = row["key"]
+        raw_value = row["value"]
+        try:
+            settings_map[key] = json.loads(raw_value)
+        except json.JSONDecodeError:
+            settings_map[key] = raw_value
+    return settings_map
+
+
+def save_runtime_settings(values: dict[str, Any]) -> None:
+    if not values:
+        return
+    payload = [(key, json.dumps(value)) for key, value in values.items()]
+    with get_connection() as connection:
+        connection.executemany(
+            """
+            INSERT INTO runtime_settings (key, value)
+            VALUES (?, ?)
+            ON CONFLICT(key) DO UPDATE SET
+                value = excluded.value,
+                updated_at = CURRENT_TIMESTAMP
+            """,
+            payload,
+        )

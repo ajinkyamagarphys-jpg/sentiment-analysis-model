@@ -3,73 +3,396 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Mental Health Sentiment Analysis</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <title>MindTone | Sentiment Analysis Assistant</title>
+    <meta
+      name="description"
+      content="A calm, conversational sentiment analysis interface powered by BERT and Gemini."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/main.css" />
+    <link rel="stylesheet" href="./css/modals.css" />
+    <link rel="stylesheet" href="./css/animations.css" />
   </head>
   <body>
-    <main class="app-shell">
-      <section class="workspace" aria-label="Sentiment analyzer">
-        <header class="topbar">
-          <div>
-            <p class="eyebrow">BERT sentiment + Gemini mental-health signal</p>
-            <h1>Mental Health Sentiment Analysis</h1>
-          </div>
-          <div class="status" id="status">Checking API...</div>
-        </header>
+    <div class="app-backdrop" aria-hidden="true"></div>
 
-        <form id="analysis-form" class="input-panel">
-          <label for="statement">User statement</label>
+    <main class="app-shell" aria-label="Sentiment analysis chat application">
+      <header class="app-header glass-panel fade-in">
+        <div>
+          <p class="eyebrow">BERT + Gemini Mental Health Analysis</p>
+          <h1>MindTone Assistant</h1>
+        </div>
+        <div class="header-meta">
+          <div id="connection-status" class="status-pill" role="status" aria-live="polite">
+            Connecting...
+          </div>
+          <nav class="nav-actions" aria-label="Application navigation">
+            <button class="icon-btn with-text" id="open-settings" aria-label="Open settings">
+              <img src="./assets/icons/settings.svg" alt="" aria-hidden="true" />
+              <span>Settings</span>
+            </button>
+            <button class="icon-btn with-text" id="open-how" aria-label="Open how it works">
+              <img src="./assets/icons/info.svg" alt="" aria-hidden="true" />
+              <span>How it Works</span>
+            </button>
+            <button class="icon-btn with-text" id="open-credits" aria-label="Open credits">
+              <img src="./assets/icons/team.svg" alt="" aria-hidden="true" />
+              <span>Credits</span>
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      <section class="chat-surface glass-panel slide-up" aria-label="Conversation workspace">
+        <div id="chat-log" class="chat-log" aria-live="polite" aria-relevant="additions text">
+          <article class="message ai">
+            <div class="message-meta">Analyzer</div>
+            <div class="bubble">Share a statement whenever you are ready. I will run BERT for general sentiment and Gemini for mental-health-oriented labeling.</div>
+          </article>
+        </div>
+
+        <div id="typing-indicator" class="typing-indicator hidden" aria-live="assertive">
+          <span></span><span></span><span></span>
+          <p>Analyzing your message...</p>
+        </div>
+
+        <form id="composer-form" class="composer" aria-label="Message composer">
+          <label class="sr-only" for="statement">Type your statement</label>
           <textarea
             id="statement"
             name="statement"
-            rows="7"
-            placeholder="Type a statement to analyze..."
+            rows="1"
+            placeholder="Type your statement and press Enter..."
+            aria-label="Statement input"
             required
           ></textarea>
-          <div class="actions">
-            <button type="submit" id="submit-button">Analyze</button>
-            <button type="button" id="reset-button" class="secondary">New conversation</button>
+          <div class="composer-actions">
+            <button type="button" id="new-conversation" class="secondary-btn">New Chat</button>
+            <button type="submit" id="send-message">Analyze</button>
           </div>
         </form>
-
-        <section class="result-grid" aria-live="polite">
-          <article class="result-card primary-result">
-            <span class="label">Mental-health signal</span>
-            <strong id="mental-label">Waiting</strong>
-            <span id="mental-confidence">Confidence: --</span>
-            <span id="mental-source">Source: --</span>
-          </article>
-
-          <article class="result-card primary-result">
-            <span class="label">BERT general sentiment</span>
-            <strong id="bert-label">Waiting</strong>
-            <span id="bert-confidence">Confidence: --</span>
-            <span id="bert-source">Source: --</span>
-          </article>
-
-          <article class="result-card">
-            <span class="label">Recommendation</span>
-            <p id="recommendation">Submit a statement to see the analysis.</p>
-          </article>
-        </section>
-
-        <section class="scores-layout">
-          <div class="scores-section">
-            <h2>Mental-health Scores</h2>
-            <div id="mental-scores" class="scores"></div>
-          </div>
-          <div class="scores-section">
-            <h2>BERT Scores</h2>
-            <div id="bert-scores" class="scores"></div>
-          </div>
-        </section>
-
-        <p class="disclaimer" id="disclaimer">
-          This tool provides sentiment analysis only and does not replace medical, psychological, or emergency care.
-        </p>
       </section>
     </main>
 
-    <script src="./script.js"></script>
+    <aside
+      id="settings-modal"
+      class="modal settings-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="settings-title"
+      hidden
+    >
+      <div class="modal-overlay" data-close="settings"></div>
+      <section class="modal-panel">
+        <header class="modal-header">
+          <h2 id="settings-title">Settings</h2>
+          <button class="icon-btn close-btn" data-close="settings" aria-label="Close settings">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </header>
+
+        <form id="settings-form" class="settings-form" novalidate>
+          <fieldset>
+            <legend>BERT Model</legend>
+            <label class="toggle-row" for="enable-bert">
+              <span>Enable BERT</span>
+              <input id="enable-bert" type="checkbox" />
+            </label>
+
+            <label for="bert-threshold">Confidence threshold</label>
+            <input id="bert-threshold" type="range" min="0" max="1" step="0.01" />
+            <div class="helper-line">
+              <span>Lower catches more nuance.</span>
+              <strong id="threshold-value">0.58</strong>
+            </div>
+
+            <label for="context-window">Context window (messages)</label>
+            <input id="context-window" type="number" min="1" max="50" step="1" />
+          </fieldset>
+
+          <fieldset>
+            <legend>Gemini</legend>
+            <label class="toggle-row" for="enable-gemini">
+              <span>Enable Gemini</span>
+              <input id="enable-gemini" type="checkbox" />
+            </label>
+
+            <label for="gemini-api-key">API Key</label>
+            <input id="gemini-api-key" type="password" autocomplete="off" placeholder="AIza..." />
+            <p id="gemini-api-note" class="helper-line">Leave blank to keep existing key.</p>
+
+            <label for="gemini-model">Model</label>
+            <select id="gemini-model">
+              <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+              <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+              <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+              <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+            </select>
+          </fieldset>
+
+          <fieldset>
+            <legend>Interface</legend>
+            <label class="toggle-row" for="show-detailed-gemini">
+              <span>Detailed Gemini output</span>
+              <input id="show-detailed-gemini" type="checkbox" />
+            </label>
+            <p class="helper-line">Show full mental-health label scores in each response.</p>
+          </fieldset>
+
+          <fieldset>
+            <legend>Backend</legend>
+            <label for="backend-url">Backend URL</label>
+            <div class="inline-field">
+              <input id="backend-url" type="url" placeholder="http://127.0.0.1:8000" required />
+              <span id="backend-validity" class="validity-dot" aria-hidden="true"></span>
+            </div>
+            <div class="settings-actions compact">
+              <button type="button" id="test-connection" class="secondary-btn">Test connection</button>
+            </div>
+          </fieldset>
+
+          <div class="settings-actions">
+            <button type="submit">Save</button>
+            <button type="button" id="reset-settings" class="secondary-btn">Reset</button>
+          </div>
+        </form>
+      </section>
+    </aside>
+
+    <section
+      id="how-modal"
+      class="modal fullscreen-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="how-title"
+      hidden
+    >
+      <div class="modal-overlay" data-close="how"></div>
+      <article class="modal-full-content">
+        <header class="modal-header sticky">
+          <h2 id="how-title">How It Works</h2>
+          <button class="icon-btn close-btn" data-close="how" aria-label="Close how it works">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </header>
+
+        <div class="how-body">
+          <section class="explain-section reveal">
+            <h3>1. Overview</h3>
+            <p>This tool analyzes the emotional tone of text using AI models.</p>
+            <p class="callout">Disclaimer: This is not a diagnosis or replacement for professional care.</p>
+          </section>
+
+          <section class="explain-section reveal">
+            <h3>2. Analysis Pipeline</h3>
+            <div class="diagram-shell">
+              <img
+                src="./assets/illustrations/pipeline-flow.svg"
+                alt="Flowchart from user input to dual model analysis and combined results"
+              />
+            </div>
+          </section>
+
+          <details class="explain-card reveal" open>
+            <summary>
+              <h3>3. BERT Sentiment Model</h3>
+            </summary>
+            <p>
+              BERT is a language model that reads context around words to classify overall sentiment as positive, neutral, or negative.
+            </p>
+            <div class="mini-grid">
+              <div class="diagram-shell" id="bert-pie-chart" aria-label="BERT training distribution chart"></div>
+              <img
+                src="./assets/illustrations/bert-network.svg"
+                alt="Simplified BERT neural network illustration"
+              />
+            </div>
+            <div class="example-block">
+              <p><strong>Example:</strong> "I handled this better than I expected."</p>
+              <p>Output: <code>positive</code> (0.84 confidence)</p>
+            </div>
+          </details>
+
+          <details class="explain-card reveal" open>
+            <summary>
+              <h3>4. Gemini Mental Health Analysis</h3>
+            </summary>
+            <p>
+              Gemini adds a mental-health lens that maps language patterns to categories like stress, anxiety, loneliness, or normal state.
+            </p>
+            <ul class="tag-list" aria-label="Mental health categories">
+              <li><span class="mh-pill-icon">A</span> Anxiety</li>
+              <li><span class="mh-pill-icon">D</span> Depression</li>
+              <li><span class="mh-pill-icon">S</span> Stress</li>
+              <li><span class="mh-pill-icon">L</span> Loneliness</li>
+              <li><span class="mh-pill-icon">G</span> Anger</li>
+              <li><span class="mh-pill-icon">N</span> Normal</li>
+              <li><span class="mh-pill-icon">R</span> Suicidal</li>
+            </ul>
+            <div class="mini-grid">
+              <img
+                src="./assets/illustrations/mental-health-tree.svg"
+                alt="Tree diagram branching into mental health categories"
+              />
+              <div class="example-block">
+                <p><strong>Detection Path Example</strong></p>
+                <p>"I feel overwhelmed"</p>
+                <p>Input tone -> pressure language -> stress / anxiety candidate -> final label</p>
+              </div>
+            </div>
+          </details>
+
+          <details class="explain-card reveal" open>
+            <summary>
+              <h3>5. Privacy &amp; Data</h3>
+            </summary>
+            <p>Conversation snippets are saved locally in SQLite for context-aware analysis.</p>
+            <div class="mini-grid">
+              <img
+                src="./assets/illustrations/context-window.svg"
+                alt="Sliding context window diagram over recent messages"
+              />
+              <p class="callout">Your data stays on your device.</p>
+            </div>
+          </details>
+
+          <details class="explain-card reveal" open>
+            <summary>
+              <h3>6. Understanding Your Results</h3>
+            </summary>
+            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1rem; margin-top: 1rem;">
+              <div class="diagram-shell" id="confidence-gauge" aria-label="Confidence gauge example" style="width: 100%; max-width: 240px; margin: 0 auto; padding: 1rem;"></div>
+              <div>
+                <p>Higher confidence means the model sees a clearer language pattern.</p>
+                <p>Low confidence means mixed signals; read output as directional, not absolute.</p>
+              </div>
+            </div>
+            <p class="callout">
+              If content includes self-harm intent, seek immediate professional or emergency support.
+            </p>
+            <p class="resource-line">US &amp; Canada: Call or text <strong>988</strong> (Suicide &amp; Crisis Lifeline).</p>
+          </details>
+        </div>
+      </article>
+    </section>
+
+    <section
+      id="credits-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="credits-title"
+      hidden
+    >
+      <div class="modal-overlay" data-close="credits"></div>
+      <article class="modal-centered">
+        <header class="modal-header">
+          <h2 id="credits-title">Built by</h2>
+          <button class="icon-btn close-btn" data-close="credits" aria-label="Close credits">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </header>
+
+        <div class="team-grid">
+          <article class="team-card">
+            <div class="avatar-ring" aria-hidden="true"></div>
+            <h3>Aarsh Joshi (PRN: 202501040435)</h3>
+            <div class="social-row">
+              <a href="#" aria-label="GitHub profile">
+                <img src="./assets/icons/github.svg" alt="" aria-hidden="true" />
+              </a>
+              <a href="#" aria-label="LinkedIn profile">
+                <img src="./assets/icons/linkedin.svg" alt="" aria-hidden="true" />
+              </a>
+              <a href="mailto:aarsh@example.com" aria-label="Email Aarsh">
+                <img src="./assets/icons/email.svg" alt="" aria-hidden="true" />
+              </a>
+            </div>
+          </article>
+
+          <article class="team-card">
+            <div class="avatar-ring" aria-hidden="true"></div>
+            <h3>Ajinkya Magar (PRN: [Placeholder])</h3>
+            <div class="social-row">
+              <a href="#" aria-label="GitHub profile">
+                <img src="./assets/icons/github.svg" alt="" aria-hidden="true" />
+              </a>
+              <a href="#" aria-label="LinkedIn profile">
+                <img src="./assets/icons/linkedin.svg" alt="" aria-hidden="true" />
+              </a>
+              <a href="mailto:ajinkya@example.com" aria-label="Email Ajinkya">
+                <img src="./assets/icons/email.svg" alt="" aria-hidden="true" />
+              </a>
+            </div>
+          </article>
+
+          <article class="team-card">
+            <div class="avatar-ring" aria-hidden="true"></div>
+            <h3>Varad Kurwade (PRN: [Placeholder])</h3>
+            <div class="social-row">
+              <a href="#" aria-label="GitHub profile">
+                <img src="./assets/icons/github.svg" alt="" aria-hidden="true" />
+              </a>
+              <a href="#" aria-label="LinkedIn profile">
+                <img src="./assets/icons/linkedin.svg" alt="" aria-hidden="true" />
+              </a>
+              <a href="mailto:varad@example.com" aria-label="Email Varad">
+                <img src="./assets/icons/email.svg" alt="" aria-hidden="true" />
+              </a>
+            </div>
+          </article>
+        </div>
+
+        <div class="credits-footer">
+          <span class="open-source-badge">Open Source</span>
+          <div class="stack-icons" aria-label="Tech stack">
+            <span><img src="./assets/icons/bert.svg" alt="" aria-hidden="true" />BERT</span>
+            <span><img src="./assets/icons/gemini.svg" alt="" aria-hidden="true" />Gemini</span>
+            <span><img src="./assets/icons/fastapi.svg" alt="" aria-hidden="true" />FastAPI</span>
+            <span><img src="./assets/icons/sqlite.svg" alt="" aria-hidden="true" />SQLite</span>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+    <template id="analysis-template">
+      <article class="analysis-card fade-in">
+        <header>
+          <div class="badge-wrap">
+            <span class="sentiment-badge" data-sentiment-badge>
+              <img src="./assets/icons/neutral.svg" alt="" aria-hidden="true" />
+              <span data-sentiment-text>neutral</span>
+            </span>
+            <span class="source-chip" data-source></span>
+          </div>
+          <strong data-mental-label>normal</strong>
+        </header>
+        <p class="analysis-line">
+          BERT: <span data-bert-label>neutral</span>
+          <span class="dot" aria-hidden="true">•</span>
+          Gemini: <span data-gemini-label>normal</span>
+        </p>
+        <div class="confidence-wrap" aria-label="Confidence score">
+          <div class="confidence-track">
+            <span data-confidence-fill></span>
+          </div>
+          <strong data-confidence-text>0%</strong>
+        </div>
+        <p class="recommendation" data-recommendation></p>
+        <div class="detailed-gemini" data-detailed-gemini hidden>
+          <p class="detail-title">Gemini category breakdown</p>
+          <div class="score-list" data-gemini-scores></div>
+        </div>
+      </article>
+    </template>
+
+    <script type="module" src="./js/app.js"></script>
   </body>
 </html>

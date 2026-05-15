@@ -1,3 +1,12 @@
+---
+title: MindTone API
+emoji: 🧠
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+---
 # Mental Health Sentiment Analysis
 
 FastAPI + SQLite project for classifying user statements. The backend uses your trained local BERT model for 3-class general sentiment only: `positive`, `neutral`, and `negative`. Gemini is used separately for broader mental-health labels such as anxiety, depression, stress, loneliness, anger, normal, and suicidal.
@@ -82,19 +91,40 @@ Start the API from the project root (with the virtual environment active):
 uvicorn app.main:app --reload --app-dir backend --host 127.0.0.1 --port 8000
 ```
 
+Or use the helper script:
+
+```bash
+./start_backend.sh
+```
+
 Check backend health:
 
 ```bash
 curl http://127.0.0.1:8000/health
 ```
 
-Open `frontend/index.html` in a browser, or serve the folder with any static server:
+Open `frontend/index.html` in a browser, or serve the folder with a static server.
+To run the frontend on a local server, open a new terminal window and run:
 
 ```bash
-python -m http.server 5500 --directory frontend
+cd frontend
+python3 -m http.server 5500
 ```
 
-Then open `http://127.0.0.1:5500`.
+Or use:
+
+```bash
+./start_frontend.sh
+```
+
+Then open `http://localhost:5500` in your browser.
+
+The frontend now auto-detects local backends (`127.0.0.1`/`localhost`) and includes a backend settings panel where you can:
+
+- enable/disable BERT
+- enable/disable Gemini
+- update Gemini model and API key
+- tune BERT confidence threshold and context window
 
 ## SQLite Context
 

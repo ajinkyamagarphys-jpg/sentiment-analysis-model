@@ -1,0 +1,20 @@
+<svg viewBox="0 0 700 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="20" y="20" width="660" height="170" rx="16" fill="#f8fbff" stroke="#bfcedf"/>
+  <text x="40" y="45" font-family="Inter, sans-serif" font-size="15" fill="#334155">Conversation Timeline</text>
+
+  <rect x="55" y="70" width="82" height="90" rx="10" fill="#eef2f7" stroke="#c7d3e0"/>
+  <rect x="152" y="70" width="82" height="90" rx="10" fill="#eef2f7" stroke="#c7d3e0"/>
+  <rect x="249" y="70" width="82" height="90" rx="10" fill="#eef2f7" stroke="#c7d3e0"/>
+  <rect x="346" y="70" width="82" height="90" rx="10" fill="#eef2f7" stroke="#c7d3e0"/>
+  <rect x="443" y="70" width="82" height="90" rx="10" fill="#eef2f7" stroke="#c7d3e0"/>
+  <rect x="540" y="70" width="82" height="90" rx="10" fill="#eef2f7" stroke="#c7d3e0"/>
+
+  <rect x="235" y="62" width="305" height="106" rx="14" fill="rgba(144, 185, 232, 0.18)" stroke="#6d94c2" stroke-width="2"/>
+
+  <text x="245" y="92" font-family="Inter, sans-serif" font-size="13" fill="#2f4f73">Active context window</text>
+  <text x="246" y="114" font-family="Inter, sans-serif" font-size="12" fill="#415a77">Only recent messages are used</text>
+  <text x="246" y="132" font-family="Inter, sans-serif" font-size="12" fill="#415a77">for context-aware analysis</text>
+
+  <text x="70" y="184" font-family="Inter, sans-serif" font-size="11" fill="#64748b">Older</text>
+  <text x="565" y="184" font-family="Inter, sans-serif" font-size="11" fill="#64748b">Newest</text>
+</svg>
