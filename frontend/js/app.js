@@ -86,6 +86,7 @@ function candidateApiBases(preferred = "") {
     preferred,
     localStorage.getItem(KEY_API_BASE),
     host,
+    "https://aazhs-mindtone-api.hf.space",
     "http://127.0.0.1:8000",
     "http://localhost:8000",
   ].map(normalizeApiBase).filter(Boolean))];
@@ -390,7 +391,10 @@ composerForm.addEventListener("submit", async (event) => {
     setConnectionStatus(error.message || "Analysis failed", "error");
   } finally {
     setTyping(false);
-    statementInput.focus();
+    // Avoid focusing input on mobile to prevent the keyboard from popping up
+    if (window.matchMedia("(min-width: 840px)").matches) {
+      statementInput.focus();
+    }
   }
 });
 

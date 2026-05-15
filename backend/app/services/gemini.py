@@ -8,8 +8,15 @@ import httpx
 
 
 class GeminiSentimentFallback:
-    def __init__(self, api_key: str, model: str, labels: Optional[list[str]] = None) -> None:
-        self.api_key = api_key
+    def __init__(
+        self,
+        api_key: str,
+        model: str,
+        labels: Optional[list[str]] = None,
+        api_keys: Optional[list[str]] = None,
+    ) -> None:
+        self.api_key = api_key.strip()
+        self.api_keys = self._normalize_keys(api_keys or [])
         self.model = model
         self.labels = labels or [
             "normal",
@@ -21,24 +28,38 @@ class GeminiSentimentFallback:
             "positive",
             "suicidal",
         ]
+        self._key_cursor = 0
 
     @property
     def configured(self) -> bool:
-        return bool(self.api_key)
+        return bool(self._all_keys())
 
-    def update_configuration(self, api_key: Optional[str] = None, model: Optional[str] = None) -> None:
+    def update_configuration(
+        self,
+        api_key: Optional[str] = None,
+        api_keys: Optional[list[str]] = None,
+        model: Optional[str] = None,
+    ) -> None:
         if api_key is not None:
             self.api_key = api_key.strip()
+        if api_keys is not None:
+            self.api_keys = self._normalize_keys(api_keys)
         if model is not None:
             normalized = model.strip()
             if normalized:
                 self.model = normalized
+        all_keys = self._all_keys()
+        if not all_keys:
+            self._key_cursor = 0
+        else:
+            self._key_cursor = self._key_cursor % len(all_keys)
 
     async def analyze(self, statement: str, context: list[dict[str, str]]) -> dict[str, Any]:
-        if not self.configured:
+        keys = self._all_keys()
+        if not keys:
             return {
                 "available": False,
-                "reason": "GEMINI_API_KEY is not configured.",
+                "reason": "Gemini API keys are not configured.",
                 "label": "unknown",
                 "confidence": 0.0,
                 "all_scores": [],
@@ -53,20 +74,48 @@ class GeminiSentimentFallback:
                 "response_mime_type": "application/json",
             },
         }
-        headers = {
-            "x-goog-api-key": self.api_key,
-            "Content-Type": "application/json",
-        }
+
+        ordered_keys, start_index = self._ordered_keys(keys)
+        last_error: Optional[dict[str, Any]] = None
 
         async with httpx.AsyncClient(timeout=30) as client:
-            response = await client.post(url, headers=headers, json=payload)
-            if response.status_code != 200:
-                try:
-                    error_data = response.json()
-                    error_msg = error_data.get("error", {}).get("message", response.text)
-                except Exception:
-                    error_msg = response.text
-                return {
+            for index, key in enumerate(ordered_keys):
+                headers = {
+                    "x-goog-api-key": key,
+                    "Content-Type": "application/json",
+                }
+                response = await client.post(url, headers=headers, json=payload)
+                if response.status_code == 200:
+                    body = response.json()
+                    parsed = self._parse_json(self._extract_text(body))
+                    scores = parsed.get("all_scores", [])
+                    if isinstance(scores, dict):
+                        scores = [{"label": label, "score": float(score)} for label, score in scores.items()]
+                    scores = [
+                        {"label": str(item.get("label", "unknown")), "score": float(item.get("score", 0.0))}
+                        for item in scores
+                        if isinstance(item, dict)
+                    ]
+                    scores.sort(key=lambda item: item["score"], reverse=True)
+
+                    label = str(parsed.get("label") or (scores[0]["label"] if scores else "unknown"))
+                    confidence = float(parsed.get("confidence") or (scores[0]["score"] if scores else 0.0))
+                    absolute_index = (start_index + index) % len(keys)
+                    self._key_cursor = absolute_index
+                    reason = parsed.get("rationale", "Gemini fallback completed.")
+                    if index > 0:
+                        reason = f"Gemini fallback key used after rate limit. {reason}"
+                    return {
+                        "available": True,
+                        "label": label,
+                        "confidence": max(0.0, min(1.0, confidence)),
+                        "all_scores": scores,
+                        "reason": reason,
+                        "raw": parsed,
+                    }
+
+                error_msg = self._extract_error_message(response)
+                last_error = {
                     "available": False,
                     "reason": f"Gemini API Error ({response.status_code}): {error_msg}",
                     "label": "unknown",
@@ -74,29 +123,16 @@ class GeminiSentimentFallback:
                     "all_scores": [],
                     "raw": None,
                 }
-            body = response.json()
+                if self._is_rate_limit(response.status_code, error_msg) and index < len(ordered_keys) - 1:
+                    continue
+                return last_error
 
-        text = self._extract_text(body)
-        parsed = self._parse_json(text)
-        scores = parsed.get("all_scores", [])
-        if isinstance(scores, dict):
-            scores = [{"label": label, "score": float(score)} for label, score in scores.items()]
-        scores = [
-            {"label": str(item.get("label", "unknown")), "score": float(item.get("score", 0.0))}
-            for item in scores
-            if isinstance(item, dict)
-        ]
-        scores.sort(key=lambda item: item["score"], reverse=True)
-
-        label = str(parsed.get("label") or (scores[0]["label"] if scores else "unknown"))
-        confidence = float(parsed.get("confidence") or (scores[0]["score"] if scores else 0.0))
-        return {
-            "available": True,
-            "label": label,
-            "confidence": max(0.0, min(1.0, confidence)),
-            "all_scores": scores,
-            "reason": parsed.get("rationale", "Gemini fallback completed."),
-            "raw": parsed,
+        return last_error or {
+            "available": False,
+            "reason": "Gemini API keys are not configured.",
+            "label": "unknown",
+            "confidence": 0.0,
+            "all_scores": [],
         }
 
     def _build_prompt(self, statement: str, context: list[dict[str, str]]) -> str:
@@ -138,3 +174,52 @@ Current user statement:
             cleaned = re.sub(r"^```(?:json)?", "", cleaned).strip()
             cleaned = re.sub(r"```$", "", cleaned).strip()
         return json.loads(cleaned)
+
+    @staticmethod
+    def _normalize_keys(keys: list[str]) -> list[str]:
+        cleaned: list[str] = []
+        for key in keys:
+            value = str(key).strip()
+            if not value or value in cleaned:
+                continue
+            cleaned.append(value)
+        return cleaned
+
+    def _all_keys(self) -> list[str]:
+        keys: list[str] = []
+        if self.api_key:
+            keys.append(self.api_key)
+        for key in self.api_keys:
+            if key and key not in keys:
+                keys.append(key)
+        return keys
+
+    def _ordered_keys(self, keys: list[str]) -> tuple[list[str], int]:
+        if not keys:
+            return [], 0
+        start = self._key_cursor % len(keys)
+        return keys[start:] + keys[:start], start
+
+    @staticmethod
+    def _extract_error_message(response: httpx.Response) -> str:
+        try:
+            error_data = response.json()
+            return error_data.get("error", {}).get("message", response.text)
+        except Exception:
+            return response.text
+
+    @staticmethod
+    def _is_rate_limit(status_code: int, message: str) -> bool:
+        if status_code == 429:
+            return True
+        lowered = message.lower()
+        indicators = [
+            "rate limit",
+            "quota",
+            "exceeded",
+            "resource_exhausted",
+            "too many requests",
+        ]
+        if status_code in {400, 403} and any(token in lowered for token in indicators):
+            return True
+        return False

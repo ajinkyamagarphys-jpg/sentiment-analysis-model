@@ -35,7 +35,6 @@ gemini = GeminiSentimentFallback(
     settings.gemini_api_key,
     settings.gemini_model,
     settings.sentiment_labels,
-    api_keys=settings.gemini_api_keys,
 )
 analyzer = SentimentAnalyzer(
     bert=bert,
@@ -47,7 +46,6 @@ runtime_settings_state = BackendSettingsState(
     enable_bert=True,
     enable_gemini=settings.allow_gemini_fallback,
     gemini_api_key=settings.gemini_api_key,
-    gemini_api_keys=settings.gemini_api_keys or [],
     gemini_model=settings.gemini_model,
     bert_confidence_threshold=settings.bert_confidence_threshold,
     context_window_messages=settings.context_window_messages,
@@ -70,7 +68,6 @@ def _settings_response() -> BackendSettingsResponse:
         enable_gemini=state.enable_gemini,
         gemini_model=state.gemini_model,
         gemini_api_key_set=bool(state.gemini_api_key),
-        gemini_api_keys=state.gemini_api_keys,
         bert_confidence_threshold=state.bert_confidence_threshold,
         context_window_messages=state.context_window_messages,
         bert_model_loaded=bert.loaded,
@@ -100,7 +97,6 @@ def startup() -> None:
     runtime_settings_state = _load_runtime_settings_state()
     gemini.update_configuration(
         api_key=runtime_settings_state.gemini_api_key,
-        api_keys=runtime_settings_state.gemini_api_keys,
         model=runtime_settings_state.gemini_model,
     )
     bert.load()
@@ -137,7 +133,6 @@ def update_settings(payload: BackendSettingsUpdateRequest) -> BackendSettingsRes
     save_runtime_settings(runtime_settings_state.model_dump())
     gemini.update_configuration(
         api_key=runtime_settings_state.gemini_api_key,
-        api_keys=runtime_settings_state.gemini_api_keys,
         model=runtime_settings_state.gemini_model,
     )
     if runtime_settings_state.enable_bert and not bert.loaded:

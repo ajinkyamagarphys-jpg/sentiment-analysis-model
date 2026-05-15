@@ -1,0 +1,24 @@
+.env
+backend/.env
+database/*.sqlite
+database/*.sqlite-shm
+database/*.sqlite-wal
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+*.pyc
+
+# OS metadata
+.DS_Store
+
+# Local datasets and archives (keep docs in data/ tracked)
+data/**/*.csv
+data/**/*.xlsx
+data/**/*.xls
+data/**/*.json
+data/**/*.sqlite
+data/**/*.zip
+
+# Large ML models
+backend/model_artifacts/

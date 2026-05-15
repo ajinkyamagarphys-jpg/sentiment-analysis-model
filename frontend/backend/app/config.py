@@ -35,17 +35,11 @@ def _labels_env() -> list[str]:
     return [item.strip() for item in raw.split(",") if item.strip()]
 
 
-def _list_env(name: str) -> list[str]:
-    raw = os.getenv(name, "")
-    return [item.strip() for item in raw.split(",") if item.strip()]
-
-
 @dataclass(frozen=True)
 class Settings:
     database_path: Path = _resolve_path(os.getenv("DATABASE_PATH", "../database/app.sqlite"), BACKEND_DIR)
     model_dir: Path = _resolve_path(os.getenv("MODEL_DIR", "./model_artifacts/bert-sentiment"), BACKEND_DIR)
     gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
-    gemini_api_keys: list[str] = None
     gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     allow_gemini_fallback: bool = _bool_env("ALLOW_GEMINI_FALLBACK", True)
     bert_confidence_threshold: float = float(os.getenv("BERT_CONFIDENCE_THRESHOLD", "0.58"))
@@ -55,7 +49,6 @@ class Settings:
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "sentiment_labels", _labels_env())
-        object.__setattr__(self, "gemini_api_keys", _list_env("GEMINI_API_KEYS"))
 
 
 settings = Settings()

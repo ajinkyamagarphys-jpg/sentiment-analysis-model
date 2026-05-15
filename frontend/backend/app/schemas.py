@@ -53,7 +53,6 @@ class BackendSettingsState(BaseModel):
     enable_bert: bool = True
     enable_gemini: bool = True
     gemini_api_key: str = Field(default="", max_length=2048)
-    gemini_api_keys: list[str] = Field(default_factory=list)
     gemini_model: str = Field(default="gemini-2.5-flash", min_length=1, max_length=128)
     bert_confidence_threshold: float = Field(default=0.58, ge=0.0, le=1.0)
     context_window_messages: int = Field(default=8, ge=1, le=50)
@@ -68,7 +67,6 @@ class BackendSettingsUpdateRequest(BaseModel):
     enable_bert: Optional[bool] = None
     enable_gemini: Optional[bool] = None
     gemini_api_key: Optional[str] = Field(default=None, max_length=2048)
-    gemini_api_keys: Optional[list[str]] = None
     gemini_model: Optional[str] = Field(default=None, max_length=128)
     bert_confidence_threshold: Optional[float] = Field(default=None, ge=0.0, le=1.0)
     context_window_messages: Optional[int] = Field(default=None, ge=1, le=50)
@@ -96,7 +94,6 @@ class BackendSettingsResponse(BaseModel):
     enable_gemini: bool
     gemini_model: str
     gemini_api_key_set: bool
-    gemini_api_keys: list[str]
     bert_confidence_threshold: float
     context_window_messages: int
     bert_model_loaded: bool

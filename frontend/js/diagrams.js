@@ -78,7 +78,7 @@ function renderGauge(target) {
   const circumference = 2 * Math.PI * 46;
   const stroke = (value / 100) * circumference;
 
-  const svg = svgEl("svg", { viewBox: "0 0 200 140", role: "img", "aria-label": "Confidence gauge example", style: "display: block; margin: 0 auto;" });
+  const svg = svgEl("svg", { viewBox: "0 40 200 140", role: "img", "aria-label": "Confidence gauge example", style: "display: block; margin: 0 auto;" });
 
   const bgArc = svgEl("path", {
     d: "M 40 110 A 60 60 0 0 1 160 110",

@@ -5,6 +5,7 @@ const DEFAULTS = {
   context_window_messages: 8,
   gemini_model: "gemini-2.5-flash",
   gemini_api_key_set: false,
+  gemini_api_keys: [],
   ui_show_detailed_gemini: true,
 };
 
@@ -22,6 +23,8 @@ export function initSettingsPanel(api) {
   const contextWindow = document.querySelector("#context-window");
   const geminiKey = document.querySelector("#gemini-api-key");
   const geminiApiNote = document.querySelector("#gemini-api-note");
+  const additionalKeysContainer = document.querySelector("#gemini-additional-keys-container");
+  const addKeyBtn = document.querySelector("#add-gemini-key");
   const geminiModel = document.querySelector("#gemini-model");
   const backendUrl = document.querySelector("#backend-url");
   const backendValidity = document.querySelector("#backend-validity");
@@ -30,6 +33,21 @@ export function initSettingsPanel(api) {
   const showDetailedGemini = document.querySelector("#show-detailed-gemini");
 
   let lastLoaded = { ...DEFAULTS };
+
+  function createKeyRow(value = "") {
+    const row = document.createElement("div");
+    row.className = "gemini-key-row";
+    row.innerHTML = `
+      <input type="password" class="additional-gemini-key" autocomplete="off" placeholder="AIza..." value="${value}" />
+      <button type="button" class="remove-key-btn" title="Remove key">&times;</button>
+    `;
+    row.querySelector(".remove-key-btn").addEventListener("click", () => {
+      row.remove();
+      saveDraft();
+    });
+    row.querySelector("input").addEventListener("input", saveDraft);
+    return row;
+  }
 
   function normalizeUrl(value) {
     return String(value || "").trim().replace(/\/+$/, "");
@@ -91,6 +109,9 @@ export function initSettingsPanel(api) {
       gemini_model: geminiModel.value.trim() || "gemini-2.5-flash",
       backend_url: normalizeUrl(backendUrl.value),
       ui_show_detailed_gemini: showDetailedGemini.checked,
+      gemini_api_keys: Array.from(document.querySelectorAll(".additional-gemini-key"))
+        .map((input) => input.value.trim())
+        .filter((val) => val !== ""),
     };
 
     if (geminiKey.value.trim()) {
@@ -108,6 +129,12 @@ export function initSettingsPanel(api) {
     contextWindow.value = String(merged.context_window_messages);
     geminiModel.value = merged.gemini_model || DEFAULTS.gemini_model;
     geminiKey.value = "";
+    additionalKeysContainer.innerHTML = "";
+    if (Array.isArray(merged.gemini_api_keys)) {
+      merged.gemini_api_keys.forEach((key) => {
+        additionalKeysContainer.appendChild(createKeyRow(key));
+      });
+    }
     showDetailedGemini.checked = Boolean(merged.ui_show_detailed_gemini);
     backendUrl.value = normalizeUrl(merged.backend_url || api.getApiBase());
     geminiApiNote.textContent = merged.gemini_api_key_set
@@ -130,6 +157,11 @@ export function initSettingsPanel(api) {
 
   openButton.addEventListener("click", openModal);
   closeButtons.forEach((btn) => btn.addEventListener("click", closeModal));
+
+  addKeyBtn.addEventListener("click", () => {
+    additionalKeysContainer.appendChild(createKeyRow());
+    saveDraft();
+  });
 
   threshold.addEventListener("input", () => {
     thresholdValue.textContent = Number(threshold.value).toFixed(2);
@@ -196,6 +228,7 @@ export function initSettingsPanel(api) {
       bert_confidence_threshold: payload.bert_confidence_threshold,
       context_window_messages: payload.context_window_messages,
       gemini_model: payload.gemini_model,
+      gemini_api_keys: payload.gemini_api_keys,
     };
     if (payload.gemini_api_key) {
       requestPayload.gemini_api_key = payload.gemini_api_key;

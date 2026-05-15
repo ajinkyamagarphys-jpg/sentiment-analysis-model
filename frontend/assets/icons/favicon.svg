@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <style>
+      @keyframes coreColor {
+        0% { fill: #6366f1; transform: scale(1); }
+        25% { fill: #a855f7; transform: scale(1.2); }
+        50% { fill: #ec4899; transform: scale(0.9); }
+        75% { fill: #10b981; transform: scale(1.1); }
+        100% { fill: #6366f1; transform: scale(1); }
+      }
+      @keyframes waveSpin {
+        0% { transform: rotate(0deg); stroke: #ffffff; }
+        25% { stroke: #60a5fa; }
+        50% { transform: rotate(180deg); stroke: #818cf8; }
+        75% { stroke: #f472b6; }
+        100% { transform: rotate(360deg); stroke: #ffffff; }
+      }
+      @keyframes outerPulse {
+        0%, 100% { stroke-width: 4; stroke: #8b5cf6; transform: scale(1) rotate(0deg); opacity: 0.8; }
+        50% { stroke-width: 10; stroke: #ec4899; transform: scale(1.05) rotate(-45deg); opacity: 1; }
+      }
+      
+      .center-core {
+        transform-origin: 50px 50px;
+        animation: coreColor 4s ease-in-out infinite;
+      }
+      .middle-wave {
+        transform-origin: 50px 50px;
+        animation: waveSpin 3s linear infinite;
+        fill: none;
+        stroke-width: 8;
+        stroke-linecap: round;
+        stroke-dasharray: 40 40;
+      }
+      .outer-ring {
+        transform-origin: 50px 50px;
+        animation: outerPulse 4s ease-in-out infinite;
+        fill: none;
+        stroke-linecap: round;
+        stroke-dasharray: 50 20 10 20;
+      }
+      
+      /* Dark mode/light mode adaptive background if needed */
+      rect { fill: transparent; }
+    </style>
+  </defs>
+  
+  <rect width="100" height="100" rx="20" />
+  
+  <!-- Outer pulsing ring -->
+  <circle cx="50" cy="50" r="42" class="outer-ring" />
+  
+  <!-- Spinning segmented waves -->
+  <circle cx="50" cy="50" r="28" class="middle-wave" />
+  
+  <!-- Transforming glowing core -->
+  <path d="M 50 35 L 59 47 L 72 49 L 61 57 L 65 70 L 50 63 L 35 70 L 39 57 L 28 49 L 41 47 Z" class="center-core" />
+</svg>

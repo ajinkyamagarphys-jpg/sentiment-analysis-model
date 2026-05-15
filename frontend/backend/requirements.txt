@@ -1,0 +1,11 @@
+# Use Python 3.11 or 3.12. Python 3.14 may not have wheels for this ML stack.
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+httpx==0.28.1
+python-dotenv==1.0.1
+pydantic==2.10.4
+pandas==2.2.3
+scikit-learn==1.6.0
+torch==2.5.1
+transformers==4.47.1
+accelerate==1.2.1

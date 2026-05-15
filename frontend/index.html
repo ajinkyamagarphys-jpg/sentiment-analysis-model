@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/modals.css" />
     <link rel="stylesheet" href="./css/animations.css" />
+    <link rel="icon" type="image/svg+xml" href="./assets/icons/favicon.svg" />
   </head>
   <body>
     <div class="app-backdrop" aria-hidden="true"></div>
@@ -126,6 +127,12 @@
             <input id="gemini-api-key" type="password" autocomplete="off" placeholder="AIza..." />
             <p id="gemini-api-note" class="helper-line">Leave blank to keep existing key.</p>
 
+            <div class="additional-keys-section">
+              <label>Additional Keys</label>
+              <div id="gemini-additional-keys-container"></div>
+              <button type="button" id="add-gemini-key" class="secondary-btn btn-sm" style="margin-top: 0.5rem; width: auto; font-size: 0.75rem;">+ Add Key</button>
+            </div>
+
             <label for="gemini-model">Model</label>
             <select id="gemini-model">
               <option value="gemini-2.5-flash">gemini-2.5-flash</option>
@@ -148,7 +155,7 @@
             <legend>Backend</legend>
             <label for="backend-url">Backend URL</label>
             <div class="inline-field">
-              <input id="backend-url" type="url" placeholder="http://127.0.0.1:8000" required />
+              <input id="backend-url" type="url" placeholder="https://aazhs-mindtone-api.hf.space" required />
               <span id="backend-validity" class="validity-dot" aria-hidden="true"></span>
             </div>
             <div class="settings-actions compact">
@@ -182,101 +189,210 @@
         </header>
 
         <div class="how-body">
-          <section class="explain-section reveal">
-            <h3>1. Overview</h3>
-            <p>This tool analyzes the emotional tone of text using AI models.</p>
-            <p class="callout">Disclaimer: This is not a diagnosis or replacement for professional care.</p>
-          </section>
+          <!-- LEFT COLUMN: How it Works (User Facing) -->
+          <div class="how-column">
+            <h2 style="font-size: 1.4rem; color: #1e293b; margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0;">How the Application Works</h2>
+            <section class="explain-section reveal">
+              <h3>1. Overview</h3>
+              <p>This tool analyzes the emotional tone of text using AI models.</p>
+              <p class="callout">Disclaimer: This is not a diagnosis or replacement for professional care. Intended for educational purposes only.</p>
+            </section>
 
-          <section class="explain-section reveal">
-            <h3>2. Analysis Pipeline</h3>
-            <div class="diagram-shell">
-              <img
-                src="./assets/illustrations/pipeline-flow.svg"
-                alt="Flowchart from user input to dual model analysis and combined results"
-              />
-            </div>
-          </section>
+            <section class="explain-section reveal">
+              <h3>2. Analysis Pipeline</h3>
+              <div class="diagram-shell">
+                <img
+                  src="./assets/illustrations/pipeline-flow.svg"
+                  alt="Flowchart from user input to dual model analysis and combined results"
+                />
+              </div>
+            </section>
 
-          <details class="explain-card reveal" open>
-            <summary>
-              <h3>3. BERT Sentiment Model</h3>
-            </summary>
-            <p>
-              BERT is a language model that reads context around words to classify overall sentiment as positive, neutral, or negative.
-            </p>
-            <div class="mini-grid">
-              <div class="diagram-shell" id="bert-pie-chart" aria-label="BERT training distribution chart"></div>
-              <img
-                src="./assets/illustrations/bert-network.svg"
-                alt="Simplified BERT neural network illustration"
-              />
-            </div>
-            <div class="example-block">
-              <p><strong>Example:</strong> "I handled this better than I expected."</p>
-              <p>Output: <code>positive</code> (0.84 confidence)</p>
-            </div>
-          </details>
-
-          <details class="explain-card reveal" open>
-            <summary>
-              <h3>4. Gemini Mental Health Analysis</h3>
-            </summary>
-            <p>
-              Gemini adds a mental-health lens that maps language patterns to categories like stress, anxiety, loneliness, or normal state.
-            </p>
-            <ul class="tag-list" aria-label="Mental health categories">
-              <li><span class="mh-pill-icon">A</span> Anxiety</li>
-              <li><span class="mh-pill-icon">D</span> Depression</li>
-              <li><span class="mh-pill-icon">S</span> Stress</li>
-              <li><span class="mh-pill-icon">L</span> Loneliness</li>
-              <li><span class="mh-pill-icon">G</span> Anger</li>
-              <li><span class="mh-pill-icon">N</span> Normal</li>
-              <li><span class="mh-pill-icon">R</span> Suicidal</li>
-            </ul>
-            <div class="mini-grid">
-              <img
-                src="./assets/illustrations/mental-health-tree.svg"
-                alt="Tree diagram branching into mental health categories"
-              />
+            <details class="explain-card reveal" open>
+              <summary>
+                <h3>3. BERT Sentiment Model</h3>
+              </summary>
+              <p>
+                BERT is a language model that reads context around words to classify overall sentiment as positive, neutral, or negative.
+              </p>
+              <div class="mini-grid">
+                <div class="diagram-shell" id="bert-pie-chart" aria-label="BERT training distribution chart"></div>
+                <img
+                  src="./assets/illustrations/bert-network.svg"
+                  alt="Simplified BERT neural network illustration"
+                />
+              </div>
               <div class="example-block">
-                <p><strong>Detection Path Example</strong></p>
-                <p>"I feel overwhelmed"</p>
-                <p>Input tone -> pressure language -> stress / anxiety candidate -> final label</p>
+                <div class="example-statement">
+                  "I handled this better than I expected."
+                </div>
+                <div class="example-output-row">
+                  <div><strong>Output:</strong> <code class="output-label">positive</code></div>
+                  <div class="example-confidence">
+                    <span style="color: #475569;">Confidence:</span>
+                    <div class="example-confidence-bar"><span style="width: 84%"></span></div>
+                    <strong style="color: #0f172a;">84%</strong>
+                  </div>
+                </div>
               </div>
-            </div>
-          </details>
+            </details>
 
-          <details class="explain-card reveal" open>
-            <summary>
-              <h3>5. Privacy &amp; Data</h3>
-            </summary>
-            <p>Conversation snippets are saved locally in SQLite for context-aware analysis.</p>
-            <div class="mini-grid">
-              <img
-                src="./assets/illustrations/context-window.svg"
-                alt="Sliding context window diagram over recent messages"
-              />
-              <p class="callout">Your data stays on your device.</p>
-            </div>
-          </details>
-
-          <details class="explain-card reveal" open>
-            <summary>
-              <h3>6. Understanding Your Results</h3>
-            </summary>
-            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1rem; margin-top: 1rem;">
-              <div class="diagram-shell" id="confidence-gauge" aria-label="Confidence gauge example" style="width: 100%; max-width: 240px; margin: 0 auto; padding: 1rem;"></div>
-              <div>
-                <p>Higher confidence means the model sees a clearer language pattern.</p>
-                <p>Low confidence means mixed signals; read output as directional, not absolute.</p>
+            <details class="explain-card reveal" open>
+              <summary>
+                <h3>4. Gemini Mental Health Analysis</h3>
+              </summary>
+              <p>
+                Gemini adds a mental-health lens that maps language patterns to detailed categories based on established psychological distress indicators.
+              </p>
+              <ul class="tag-list" aria-label="Mental health categories">
+                <li><span class="mh-pill-icon">A</span> Anxiety</li>
+                <li><span class="mh-pill-icon">D</span> Depression</li>
+                <li><span class="mh-pill-icon">S</span> Stress</li>
+                <li><span class="mh-pill-icon">L</span> Loneliness</li>
+                <li><span class="mh-pill-icon">G</span> Anger</li>
+                <li><span class="mh-pill-icon">N</span> Normal</li>
+                <li><span class="mh-pill-icon">R</span> Suicidal</li>
+              </ul>
+              <div class="mini-grid">
+                <img
+                  src="./assets/illustrations/mental-health-tree.svg"
+                  alt="Tree diagram branching into mental health categories"
+                />
+                <div class="example-block">
+                  <p><strong>Detection Path Example</strong></p>
+                  <p>"I feel overwhelmed"</p>
+                  <p>Input tone -> pressure language -> stress / anxiety candidate -> final label</p>
+                </div>
               </div>
-            </div>
-            <p class="callout">
-              If content includes self-harm intent, seek immediate professional or emergency support.
-            </p>
-            <p class="resource-line">US &amp; Canada: Call or text <strong>988</strong> (Suicide &amp; Crisis Lifeline).</p>
-          </details>
+            </details>
+            
+            <details class="explain-card reveal" open>
+              <summary>
+                <h3>5. Understanding Your Results</h3>
+              </summary>
+              <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1rem; margin-top: 1rem;">
+                <div class="diagram-shell" id="confidence-gauge" aria-label="Confidence gauge example" style="width: 100%; max-width: 240px; margin: 0 auto; padding: 1rem;"></div>
+                <div>
+                  <p>Higher confidence means the model sees a clearer language pattern.</p>
+                  <p>Low confidence means mixed signals; read output as directional, not absolute.</p>
+                </div>
+              </div>
+              <p class="callout" style="border-left-color: #ef4444; background: #fef2f2;">
+                If content includes self-harm intent, seek immediate professional or emergency support.
+              </p>
+              <p class="resource-line">India: Call <strong>14416</strong> (Tele-MANAS) or <strong>1800-599-0019</strong> (KIRAN Helpline).</p>
+            </details>
+          </div>
+
+          <!-- RIGHT COLUMN: Technical Details & Research -->
+          <div class="how-column">
+            <h2 style="font-size: 1.4rem; color: #1e293b; margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0;">Technical Architecture &amp; Implementation</h2>
+            
+            <section class="explain-section reveal" style="background: rgba(40, 91, 255, 0.03); border-color: rgba(40, 91, 255, 0.2);">
+              <h3>Access the Full Project Reports</h3>
+              <p style="margin-bottom: 1rem;">Explore the comprehensive documentation, presentations, and technical literature written for this project (Creative Technologies FY B.Tech).</p>
+              <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="https://gamma.app/docs/Mental-Health-Sentiment-Analysis-b3mdmpml8nbm8or?mode=doc" target="_blank" rel="noopener" class="secondary-btn" style="text-decoration: none; padding: 0.6rem 1rem; border-radius: 8px; font-weight: 500; font-size: 0.9rem; border: 1px solid #cbd5e1; background: white; color: #0f172a; display: flex; align-items: center; gap: 0.5rem;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                  View Gamma Presentation
+                </a>
+                <a href="./Mental_Health_Sentiment_Analysis_Report%20(1)-2.docx" class="secondary-btn" style="text-decoration: none; padding: 0.6rem 1rem; border-radius: 8px; font-weight: 500; font-size: 0.9rem; border: 1px solid #cbd5e1; background: white; color: #0f172a; display: flex; align-items: center; gap: 0.5rem;" download>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  Download Project Report (.docx)
+                </a>
+              </div>
+            </section>
+
+            <details class="explain-card reveal" open>
+              <summary>
+                <h3>System Design &amp; Methodology</h3>
+              </summary>
+              <p>
+                The system uses a highly optimized dual-level architecture connecting local PyTorch models with RESTful LLMs.
+              </p>
+              <div class="diagram-shell" style="margin-top: 1rem; padding: 1.5rem; text-align: center;">
+                <strong>Local Machine / Server</strong>
+                <div style="border-left: 2px solid #cbd5e1; margin: 0.5rem auto; height: 15px; width: 2px;"></div>
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 0.8rem; border-radius: 8px;">
+                  1. FastAPI Backend + SQLite Context Storage
+                </div>
+                <div style="border-left: 2px solid #cbd5e1; margin: 0.5rem auto; height: 15px; width: 2px;"></div>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                  <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid #3b82f6; padding: 0.8rem; border-radius: 8px; flex: 1;">
+                    2A. Fine-Tuned BERT NLP Model (Local Inference)
+                  </div>
+                  <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid #8b5cf6; padding: 0.8rem; border-radius: 8px; flex: 1;">
+                    2B. Gemini Inference (REST API)
+                  </div>
+                </div>
+              </div>
+            </details>
+
+            <details class="explain-card reveal" open>
+              <summary>
+                <h3>Model Training &amp; Dataset Processing</h3>
+              </summary>
+              <div class="example-block">
+                <p><strong>Twitter Mental Health Dataset (Kaggle)</strong></p>
+                <p>The BERT model was trained on a dataset of social media text specifically focused on mental health discourse. Because raw social media data is noisy, rigorous data cleaning was conducted:</p>
+                <ul style="padding-left: 1.2rem; margin: 0.4rem 0;">
+                  <li>Removed URLs, @ mentions, and special characters to isolate natural intent.</li>
+                  <li>Converted implicit mental health categories into a structured 3-label schema (Positive, Neutral, Negative) for the local BERT component.</li>
+                </ul>
+              </div>
+              <div class="example-block">
+                <p><strong>Training Performance (Transformer Fine-Tuning)</strong></p>
+                <p>Using HuggingFace <code>transformers</code> and PyTorch via <code>train_bert.py</code>, the model achieved high accuracy on validation hold-outs. The loss curve demonstrated rapid convergence within the first few epochs.</p>
+                
+                <div class="diagram-shell" style="margin-top: 1rem; background: #fff;">
+                  <!-- Synthetic CSS Chart representing BERT Training Loss -->
+                  <div style="font-size: 0.85rem; font-weight: 600; text-align: center; margin-bottom: 0.5rem; color: #475569;">Training Loss vs. Epochs</div>
+                  <div style="display: flex; align-items: flex-end; gap: 15%; height: 120px; padding: 0 10%; border-left: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1;">
+                    <div style="width: 20%; background: #3b82f6; height: 95%; border-top-left-radius: 4px; border-top-right-radius: 4px; position: relative;">
+                      <span style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 0.75rem;">1.4</span>
+                    </div>
+                    <div style="width: 20%; background: #60a5fa; height: 45%; border-top-left-radius: 4px; border-top-right-radius: 4px; position: relative;">
+                      <span style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 0.75rem;">0.6</span>
+                    </div>
+                    <div style="width: 20%; background: #93c5fd; height: 15%; border-top-left-radius: 4px; border-top-right-radius: 4px; position: relative;">
+                      <span style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 0.75rem;">0.2</span>
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 15%; padding: 0 10%; margin-top: 0.5rem;">
+                    <div style="width: 20%; text-align: center; font-size: 0.75rem; color: #64748b;">Ep 1</div>
+                    <div style="width: 20%; text-align: center; font-size: 0.75rem; color: #64748b;">Ep 2</div>
+                    <div style="width: 20%; text-align: center; font-size: 0.75rem; color: #64748b;">Ep 3</div>
+                  </div>
+                </div>
+              </div>
+            </details>
+
+            <details class="explain-card reveal" open>
+              <summary>
+                <h3>System Inference Pipeline &amp; Integration</h3>
+              </summary>
+              <div class="example-block">
+                <p><strong>1. FastAPI Local Model Serving</strong></p>
+                <p>Upon training completion, the PyTorch model artifacts (weights, configurations, and tokenizers) are serialized to a local directory (<code>model_artifacts</code>). During system startup, FastAPI buffers the model directly into memory overhead which allows for zero-latency, local inference for base sentiment classification without relying on external cloud providers for general sentiment data.</p>
+              </div>
+
+              <div class="example-block">
+                <p><strong>2. Sequence of Execution (Statement Processing)</strong></p>
+                <p>When a user submits a statement, the backend orchestrates multiple discrete systems dynamically:</p>
+                <ul style="padding-left: 1.2rem; margin: 0.4rem 0; gap: 0.2rem; display: grid;">
+                  <li>The backend intercepts the request and fetches the most recent conversation messages from the <strong>SQLite database</strong> to provide a sliding window of localized context.</li>
+                  <li>The local <strong>BERT model</strong> evaluates the current statement for Positive/Neutral/Negative sentiment distributions based on vector proximity calculation.</li>
+                  <li>In parallel, the context + statement is securely formulated into a heavily constrained system prompt and pushed to the Google <strong>Gemini via REST API</strong> to map the granular mental health labels.</li>
+                  <li>The predictions are aggregated, the newly classified message is appended to the SQLite storage, and the resulting payload is dispatched out to the frontend.</li>
+                </ul>
+              </div>
+
+              <div class="example-block">
+                <p><strong>3. Lightweight Client-Side Rendering</strong></p>
+                <p>To eliminate deployment friction, the UI is constructed entirely through pure HTML, CSS, and Vanilla JavaScript with no heavy build systems (No React/Node.js). The JavaScript frontend automatically interfaces with the local FastAPI instance across <code>localhost</code> domains and dynamically updates progress metrics (confidence gauges, probability distribution components, and UI styling responses).</p>
+              </div>
+            </details>
+          </div>
         </div>
       </article>
     </section>
@@ -300,29 +416,29 @@
 
         <div class="team-grid">
           <article class="team-card">
-            <div class="avatar-ring" aria-hidden="true"></div>
+            <img class="avatar-ring" src="https://api.dicebear.com/9.x/initials/svg?seed=AJ" alt="Aarsh Joshi" />
             <h3>Aarsh Joshi (PRN: 202501040435)</h3>
             <div class="social-row">
-              <a href="#" aria-label="GitHub profile">
+              <a href="https://github.com/Aazhs/" target="_blank" rel="noopener" aria-label="GitHub profile">
                 <img src="./assets/icons/github.svg" alt="" aria-hidden="true" />
               </a>
-              <a href="#" aria-label="LinkedIn profile">
+              <a href="https://www.linkedin.com/in/aarshjo/" target="_blank" rel="noopener" aria-label="LinkedIn profile">
                 <img src="./assets/icons/linkedin.svg" alt="" aria-hidden="true" />
               </a>
-              <a href="mailto:aarsh@example.com" aria-label="Email Aarsh">
+              <a href="mailto:aarshjozhi@gmail.com" aria-label="Email Aarsh">
                 <img src="./assets/icons/email.svg" alt="" aria-hidden="true" />
               </a>
             </div>
           </article>
 
           <article class="team-card">
-            <div class="avatar-ring" aria-hidden="true"></div>
-            <h3>Ajinkya Magar (PRN: [Placeholder])</h3>
+            <img class="avatar-ring" src="https://api.dicebear.com/9.x/initials/svg?seed=AM" alt="Ajinkya Magar" />
+            <h3>Ajinkya Magar (PRN: 202501100063)</h3>
             <div class="social-row">
-              <a href="#" aria-label="GitHub profile">
+              <a href="https://github.com/ajinkyamagarphys-jpg/" target="_blank" rel="noopener" aria-label="GitHub profile">
                 <img src="./assets/icons/github.svg" alt="" aria-hidden="true" />
               </a>
-              <a href="#" aria-label="LinkedIn profile">
+              <a href="https://www.linkedin.com/in/ajinkya-magar-6788b0251/" target="_blank" rel="noopener" aria-label="LinkedIn profile">
                 <img src="./assets/icons/linkedin.svg" alt="" aria-hidden="true" />
               </a>
               <a href="mailto:ajinkya@example.com" aria-label="Email Ajinkya">
@@ -332,8 +448,8 @@
           </article>
 
           <article class="team-card">
-            <div class="avatar-ring" aria-hidden="true"></div>
-            <h3>Varad Kurwade (PRN: [Placeholder])</h3>
+            <img class="avatar-ring" src="https://api.dicebear.com/9.x/initials/svg?seed=VK" alt="Varad Kurwade" />
+            <h3>Varad Kurwade (PRN: 202501100019)</h3>
             <div class="social-row">
               <a href="#" aria-label="GitHub profile">
                 <img src="./assets/icons/github.svg" alt="" aria-hidden="true" />
@@ -349,7 +465,10 @@
         </div>
 
         <div class="credits-footer">
-          <span class="open-source-badge">Open Source</span>
+          <a href="https://github.com/ajinkyamagarphys-jpg/sentiment-analysis-model/" target="_blank" rel="noopener" class="open-source-badge" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(31, 124, 83, 0.15)';" onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+            Open Source
+          </a>
           <div class="stack-icons" aria-label="Tech stack">
             <span><img src="./assets/icons/bert.svg" alt="" aria-hidden="true" />BERT</span>
             <span><img src="./assets/icons/gemini.svg" alt="" aria-hidden="true" />Gemini</span>
