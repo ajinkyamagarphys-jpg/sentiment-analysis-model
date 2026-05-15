@@ -34,3 +34,9 @@ CREATE INDEX IF NOT EXISTS idx_messages_conversation_created
 
 CREATE INDEX IF NOT EXISTS idx_analyses_message_created
     ON analyses(message_id, created_at);
+
+CREATE TABLE IF NOT EXISTS runtime_settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

@@ -26,6 +26,14 @@ class GeminiSentimentFallback:
     def configured(self) -> bool:
         return bool(self.api_key)
 
+    def update_configuration(self, api_key: Optional[str] = None, model: Optional[str] = None) -> None:
+        if api_key is not None:
+            self.api_key = api_key.strip()
+        if model is not None:
+            normalized = model.strip()
+            if normalized:
+                self.model = normalized
+
     async def analyze(self, statement: str, context: list[dict[str, str]]) -> dict[str, Any]:
         if not self.configured:
             return {

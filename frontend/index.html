@@ -14,8 +14,102 @@
             <p class="eyebrow">BERT sentiment + Gemini mental-health signal</p>
             <h1>Mental Health Sentiment Analysis</h1>
           </div>
-          <div class="status" id="status">Checking API...</div>
+          <div class="status-group">
+            <div class="status" id="status">Checking backend...</div>
+            <div class="backend-chip" id="api-base">Detecting backend...</div>
+          </div>
         </header>
+
+        <section class="settings-card" aria-label="Backend settings">
+          <div class="card-title-row">
+            <h2>Backend Connection and Runtime Settings</h2>
+            <div class="settings-note" id="settings-status">Not loaded</div>
+          </div>
+          <form id="settings-form" class="settings-form">
+            <label for="backend-base">Backend URL</label>
+            <div class="inline-controls">
+              <input
+                id="backend-base"
+                name="backend-base"
+                type="url"
+                placeholder="http://127.0.0.1:8000"
+              />
+              <button type="button" class="secondary" id="reconnect-button">
+                Reconnect
+              </button>
+            </div>
+
+            <div class="toggle-row">
+              <label class="toggle-control" for="enable-bert">
+                <input id="enable-bert" name="enable-bert" type="checkbox" />
+                Enable BERT
+              </label>
+              <label class="toggle-control" for="enable-gemini">
+                <input
+                  id="enable-gemini"
+                  name="enable-gemini"
+                  type="checkbox"
+                />
+                Enable Gemini
+              </label>
+            </div>
+
+            <div class="settings-grid">
+              <label for="bert-threshold"
+                >BERT confidence threshold (0-1)</label
+              >
+              <input
+                id="bert-threshold"
+                name="bert-threshold"
+                type="number"
+                min="0"
+                max="1"
+                step="0.01"
+              />
+
+              <label for="context-window">Context window messages</label>
+              <input
+                id="context-window"
+                name="context-window"
+                type="number"
+                min="1"
+                max="50"
+                step="1"
+              />
+
+              <label for="gemini-model">Gemini model</label>
+              <input
+                id="gemini-model"
+                name="gemini-model"
+                type="text"
+                placeholder="gemini-2.5-flash"
+              />
+
+              <label for="gemini-api-key">Gemini API key</label>
+              <input
+                id="gemini-api-key"
+                name="gemini-api-key"
+                type="password"
+                autocomplete="off"
+                placeholder="Leave blank to keep existing key"
+              />
+            </div>
+            <p class="helper" id="gemini-key-status">Gemini API key not set.</p>
+
+            <div class="actions">
+              <button type="submit" id="save-settings-button">
+                Save backend settings
+              </button>
+              <button
+                type="button"
+                class="secondary"
+                id="refresh-settings-button"
+              >
+                Refresh settings
+              </button>
+            </div>
+          </form>
+        </section>
 
         <form id="analysis-form" class="input-panel">
           <label for="statement">User statement</label>
@@ -28,7 +122,9 @@
           ></textarea>
           <div class="actions">
             <button type="submit" id="submit-button">Analyze</button>
-            <button type="button" id="reset-button" class="secondary">New conversation</button>
+            <button type="button" id="reset-button" class="secondary">
+              New conversation
+            </button>
           </div>
         </form>
 
@@ -65,7 +161,8 @@
         </section>
 
         <p class="disclaimer" id="disclaimer">
-          This tool provides sentiment analysis only and does not replace medical, psychological, or emergency care.
+          This tool provides sentiment analysis only and does not replace
+          medical, psychological, or emergency care.
         </p>
       </section>
     </main>

@@ -82,6 +82,12 @@ Start the API from the project root (with the virtual environment active):
 uvicorn app.main:app --reload --app-dir backend --host 127.0.0.1 --port 8000
 ```
 
+Or use the helper script:
+
+```bash
+./start_backend.sh
+```
+
 Check backend health:
 
 ```bash
@@ -96,7 +102,20 @@ cd frontend
 python3 -m http.server 5500
 ```
 
+Or use:
+
+```bash
+./start_frontend.sh
+```
+
 Then open `http://localhost:5500` in your browser.
+
+The frontend now auto-detects local backends (`127.0.0.1`/`localhost`) and includes a backend settings panel where you can:
+
+- enable/disable BERT
+- enable/disable Gemini
+- update Gemini model and API key
+- tune BERT confidence threshold and context window
 
 ## SQLite Context
 

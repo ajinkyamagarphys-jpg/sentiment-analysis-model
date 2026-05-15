@@ -20,12 +20,21 @@ class SentimentAnalyzer:
         self.confidence_threshold = confidence_threshold
         self.allow_gemini_fallback = allow_gemini_fallback
 
-    async def analyze(self, statement: str, context: list[dict[str, str]]) -> dict[str, Any]:
+    async def analyze(
+        self,
+        statement: str,
+        context: list[dict[str, str]],
+        *,
+        enable_bert: bool = True,
+        enable_gemini: bool = True,
+        confidence_threshold: float | None = None,
+    ) -> dict[str, Any]:
         force_ai = "--force-ai" in statement
         if force_ai:
             statement = statement.replace("--force-ai", "").strip()
 
         crisis_detected = detect_crisis(statement)
+        threshold = self.confidence_threshold if confidence_threshold is None else confidence_threshold
         
         if force_ai:
             bert_result = {
@@ -36,12 +45,21 @@ class SentimentAnalyzer:
                 "model_status": "Skipped due to --force-ai flag",
                 "raw": None,
             }
+        elif not enable_bert:
+            bert_result = {
+                "label": "unknown",
+                "confidence": 0.0,
+                "source": "unavailable",
+                "all_scores": [],
+                "model_status": "BERT is disabled in runtime settings.",
+                "raw": None,
+            }
         else:
-            bert_result = self._general_sentiment(statement)
+            bert_result = self._general_sentiment(statement, threshold)
 
         mental_health_result = self._unavailable_mental_health()
 
-        if self.allow_gemini_fallback or force_ai:
+        if (self.allow_gemini_fallback and enable_gemini) or force_ai:
             try:
                 gemini_result = await self.gemini.analyze(statement, context)
                 if gemini_result["available"]:
@@ -52,6 +70,10 @@ class SentimentAnalyzer:
             except Exception as exc:
                 mental_health_result["source"] = "gemini_error"
                 mental_health_result["model_status"] = f"Gemini mental-health analysis failed: {exc}"
+        elif not enable_gemini:
+            mental_health_result["model_status"] = "Gemini is disabled in runtime settings."
+        elif not self.allow_gemini_fallback:
+            mental_health_result["model_status"] = "Gemini fallback is disabled in backend configuration."
 
         mental_health_result = self._with_safety(mental_health_result, crisis_detected)
         primary = mental_health_result if mental_health_result["source"] != "unavailable" else bert_result
@@ -69,7 +91,7 @@ class SentimentAnalyzer:
             "raw": mental_health_result.get("raw"),
         }
 
-    def _general_sentiment(self, statement: str) -> dict[str, Any]:
+    def _general_sentiment(self, statement: str, confidence_threshold: float) -> dict[str, Any]:
         bert_result = self.bert.predict(statement)
         if not bert_result["available"]:
             return {
@@ -81,7 +103,7 @@ class SentimentAnalyzer:
                 "raw": None,
             }
 
-        source = "bert" if bert_result["confidence"] >= self.confidence_threshold else "bert_low_confidence"
+        source = "bert" if bert_result["confidence"] >= confidence_threshold else "bert_low_confidence"
         return self._normalize_result(bert_result, source)
 
     @staticmethod
