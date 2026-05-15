@@ -1,3 +1,12 @@
+---
+title: MindTone API
+emoji: 🧠
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+---
 # Mental Health Sentiment Analysis
 
 FastAPI + SQLite project for classifying user statements. The backend uses your trained local BERT model for 3-class general sentiment only: `positive`, `neutral`, and `negative`. Gemini is used separately for broader mental-health labels such as anxiety, depression, stress, loneliness, anger, normal, and suicidal.
