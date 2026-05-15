@@ -1,6 +1,5 @@
 .env
 backend/.env
-backend/model_artifacts/
 database/*.sqlite
 database/*.sqlite-shm
 database/*.sqlite-wal
@@ -20,3 +19,6 @@ data/**/*.xls
 data/**/*.json
 data/**/*.sqlite
 data/**/*.zip
+
+# Large ML models
+backend/model_artifacts/
