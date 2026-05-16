@@ -16,8 +16,8 @@ CRISIS_PATTERNS = [
 
 CRISIS_RECOMMENDATION = (
     "This may include self-harm or suicide risk. If there is immediate danger, call local emergency services now. "
-    "In the U.S. or Canada, call or text 988 for the Suicide & Crisis Lifeline. "
-    "If outside the U.S., contact a local crisis line or a trusted person nearby."
+    "In India, call Tele-MANAS at 14416 or the KIRAN Helpline at 1800-599-0019 for immediate mental-health support. "
+    "If outside India, contact a local crisis line or a trusted person nearby."
 )
 
 GENERAL_RECOMMENDATION = (
